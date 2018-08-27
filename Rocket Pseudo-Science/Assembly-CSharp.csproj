@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\CameraMovement.cs" />
      <Compile Include="Assets\Scripts\PlayerController.cs" />
  <Reference Include="UnityEditor.StandardEvents">
  <HintPath>C:/Users/Quentin/Desktop/Jeux/Projets Unity/Rocket-Pseudo-Science/Rocket Pseudo-Science/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
