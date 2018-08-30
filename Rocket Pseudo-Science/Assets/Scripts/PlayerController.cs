@@ -4,16 +4,24 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-	[SerializeField] private float groundSpeed = 10;
-	[SerializeField] private float jumpForce = 25;
+	[SerializeField] private float groundSpeed = 13;
+	[SerializeField] private float jumpForce = 30;
 	[SerializeField] private float jumpBoost = 1.5f;
+	[SerializeField] private float airSpeed = 7;
+	[SerializeField] private float airJumpForce;
 	//Gravity is 10 G
 
 	private float moveInput;
 	private float moveInputRaw;
 	private float jumpInput;
+	[SerializeField] private int totalAirJumps;
+	private int airJumpAvailable;
+	[SerializeField] private float jumpCooldown;
+	private float currentJumpCooldown;
+
 	private bool facingRight = true;
 	private bool isGrounded;
+	private bool wasGrounded;
 	[SerializeField] private Transform groundCheck1;
 	[SerializeField] private Transform groundCheck2;
 	[SerializeField] private float checkRadius = 0.144f;
@@ -23,13 +31,27 @@ public class PlayerController : MonoBehaviour {
 
 	void Start () {
 		rb = GetComponent<Rigidbody2D> ();
+		airJumpAvailable = totalAirJumps;
+		currentJumpCooldown = 0;
 	}
 
 	void FixedUpdate () {
+		wasGrounded = isGrounded;
 		isGrounded = Grounded ();
 		if (isGrounded) {
+			if (!wasGrounded) {
+				//Upon landing
+				StopCoroutine("AirMove");
+				RestoreAirJump ();
+			}
 			GroundMove ();
 			JumpFromGround ();
+		} else {
+			if (wasGrounded) {
+				//Upon quitting ground
+				StartCoroutine ("AirMove");
+			}
+			JumpFromAir ();
 		}
 	}
 
@@ -46,6 +68,20 @@ public class PlayerController : MonoBehaviour {
 		if (!facingRight && moveInput > 0) {
 			//Faing left & going right
 			Flip ();
+		}
+	}
+
+	IEnumerator AirMove ()
+	//How to move when not grounded
+	{
+		while (!isGrounded) {
+			moveInput = Input.GetAxis ("Horizontal");
+			Vector2 deviation = new Vector2 (moveInput * airSpeed, 0f);
+			rb.velocity += deviation;
+
+			yield return null;
+			rb.velocity -= deviation;
+
 		}
 	}
 
@@ -67,12 +103,37 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void JumpFromGround () {
+		if (currentJumpCooldown > 0) {
+			currentJumpCooldown -= Time.deltaTime;
+			return;
+		}
 		jumpInput = Input.GetAxisRaw ("Jump");
 		moveInputRaw = Input.GetAxisRaw ("Horizontal");
 		if (jumpInput > 0) {
 			float xVelocity = groundSpeed * moveInputRaw * jumpBoost;
 			float yVelocity = jumpForce;
 			rb.velocity = new Vector2 (xVelocity, yVelocity);
+			currentJumpCooldown = jumpCooldown;
 		}
+	}
+
+	void JumpFromAir () {
+		if ((airJumpAvailable <= 0) || (currentJumpCooldown > 0)) {
+			currentJumpCooldown -= Time.deltaTime;
+			return;
+		}
+		jumpInput = Input.GetAxisRaw ("Jump");
+		moveInputRaw = Input.GetAxisRaw ("Horizontal");
+		if (jumpInput > 0) {
+			float xVelocity = groundSpeed * moveInputRaw * jumpBoost;
+			float yVelocity = airJumpForce;
+			rb.velocity = new Vector2 (xVelocity, yVelocity);
+			airJumpAvailable--;
+			currentJumpCooldown = jumpCooldown/2f;
+		}
+	}
+
+	void RestoreAirJump () {
+		airJumpAvailable = totalAirJumps;
 	}
 }

@@ -158,8 +158,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groundSpeed: 13
-  jumpForce: 31
+  jumpForce: 30
   jumpBoost: 1.5
+  airSpeed: 7
+  airJumpForce: 20
+  totalAirJumps: 1
+  jumpCooldown: 0.3
   groundCheck1: {fileID: 4676781086864416}
   groundCheck2: {fileID: 4620718770247362}
   checkRadius: 0.144
