@@ -348,7 +348,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 636879955}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5, y: -15, z: -10}
+  m_LocalPosition: {x: 10.1, y: -15, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -21261,7 +21261,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4464589783168022, guid: d04371bddc3eacb46be200f8ade10d87, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -13.5
+      value: 10.1
       objectReference: {fileID: 0}
     - target: {fileID: 4464589783168022, guid: d04371bddc3eacb46be200f8ade10d87, type: 2}
       propertyPath: m_LocalPosition.y
@@ -21293,14 +21293,8 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 114352416986455308, guid: d04371bddc3eacb46be200f8ade10d87,
         type: 2}
-      propertyPath: bullet
-      value: 
-      objectReference: {fileID: 1513236394479148, guid: 768368da293532e49b802adeca17ee79,
-        type: 2}
-    - target: {fileID: 114352416986455308, guid: d04371bddc3eacb46be200f8ade10d87,
-        type: 2}
-      propertyPath: groundSpeed
-      value: 13
+      propertyPath: shootCooldown
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d04371bddc3eacb46be200f8ade10d87, type: 2}

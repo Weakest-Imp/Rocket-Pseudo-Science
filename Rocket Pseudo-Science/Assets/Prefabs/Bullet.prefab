@@ -101,6 +101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletSpeed: 25
   direction: {x: 1, y: 0}
+  timeToDie: 3
   damage: 1
 --- !u!212 &212163232071361626
 SpriteRenderer:

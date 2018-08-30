@@ -157,19 +157,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb4fdb4b0d9f1654ba6db471ce9ce5b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundSpeed: 13
-  jumpForce: 30
-  jumpBoost: 1.5
-  airSpeed: 7
-  airJumpForce: 20
-  totalAirJumps: 1
-  jumpCooldown: 0.3
-  groundCheck1: {fileID: 4676781086864416}
-  groundCheck2: {fileID: 4620718770247362}
-  checkRadius: 0.144
-  whatIsGround:
-    serializedVersion: 2
-    m_Bits: 256
+  bullet: {fileID: 1513236394479148, guid: 768368da293532e49b802adeca17ee79, type: 2}
+  movement:
+    groundSpeed: 13
+    jumpForce: 30
+    jumpBoost: 1.5
+    airSpeed: 7
+    airJumpForce: 20
+    totalAirJumps: 1
+    jumpCooldown: 0.3
+    groundCheck1: {fileID: 4676781086864416}
+    groundCheck2: {fileID: 4620718770247362}
+    checkRadius: 0.144
+    whatIsGround:
+      serializedVersion: 2
+      m_Bits: 256
 --- !u!212 &212493176501362760
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -6,6 +6,8 @@ public class BulletMovement : MonoBehaviour {
 
 	[SerializeField] float bulletSpeed;
 	[SerializeField] Vector2 direction;
+	[SerializeField] float timeToDie;
+	float timeAlive;
 
 	[SerializeField] float damage;
 
@@ -15,15 +17,25 @@ public class BulletMovement : MonoBehaviour {
 		rb = GetComponent<Rigidbody2D> ();
 		direction.Normalize ();
 		rb.velocity = direction * bulletSpeed;
+		timeAlive = 0;
 	}
 
-	void Update () {
-		
+	void FixedUpdate () {
+		if (timeAlive > timeToDie) {
+			Explode ();
+		} else {
+			timeAlive += Time.deltaTime;
+		}
 	}
 
 	void Explode () {
 		//DealDamage();
-		//this.Destroy();
+		Destroy(gameObject);
+	}
+
+	public void SetDirection(Vector2 newDirection) {
+		direction = newDirection;
+		//Needs to rotate bullet
 	}
 
 }

@@ -4,37 +4,45 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-	[SerializeField] private float groundSpeed = 13;
-	[SerializeField] private float jumpForce = 30;
-	[SerializeField] private float jumpBoost = 1.5f;
-	[SerializeField] private float airSpeed = 7;
-	[SerializeField] private float airJumpForce = 20;
-	//Gravity is 10 G in Rigidbody2D
+	[System.Serializable]
+	public class PlayerMovement {
+		public float groundSpeed = 13;
+		public float jumpForce = 30;
+		public float jumpBoost = 1.5f;
+		public float airSpeed = 7;
+		public float airJumpForce = 20;
+		//Gravity is 10 G in Rigidbody2D
+
+		public int totalAirJumps = 1;
+		public float jumpCooldown = 0.3f;
+
+		public Transform groundCheck1;
+		public Transform groundCheck2;
+		public float checkRadius = 0.144f;
+		public LayerMask whatIsGround;
+	}
+	[SerializeField] private PlayerMovement movement;	
 
 	private float moveInput;
 	private float moveInputRaw;
 	private float jumpInput;
-	[SerializeField] private int totalAirJumps;
 	private int airJumpAvailable;
-	[SerializeField] private float jumpCooldown;
 	private float currentJumpCooldown;
 
 	private bool facingRight = true;
 	private bool isGrounded;
 	private bool wasGrounded;
-	[SerializeField] private Transform groundCheck1;
-	[SerializeField] private Transform groundCheck2;
-	[SerializeField] private float checkRadius = 0.144f;
-	[SerializeField] private LayerMask whatIsGround;
+
+	[SerializeField] GameObject bullet;
+	[SerializeField] float shootCooldown;
+	float currentShootCooldown;
+
 
 	private Rigidbody2D rb;
 
-	[Header("Bullet")]
-	[SerializeField] GameObject bullet;
-
 	void Start () {
 		rb = GetComponent<Rigidbody2D> ();
-		airJumpAvailable = totalAirJumps;
+		airJumpAvailable = movement.totalAirJumps;
 		currentJumpCooldown = 0;
 	}
 
@@ -67,7 +75,7 @@ public class PlayerController : MonoBehaviour {
 	//How to move when grounded
 	{
 		moveInput = Input.GetAxis ("Horizontal");
-		rb.velocity = new Vector2 (moveInput * groundSpeed, rb.velocity.y);
+		rb.velocity = new Vector2 (moveInput * movement.groundSpeed, rb.velocity.y);
 		if (facingRight && moveInput < 0) {
 			//Facing rihght & going left
 			Flip ();
@@ -83,7 +91,7 @@ public class PlayerController : MonoBehaviour {
 	{
 		while (!isGrounded) {
 			moveInput = Input.GetAxis ("Horizontal");
-			Vector2 deviation = new Vector2 (moveInput * airSpeed, 0f);
+			Vector2 deviation = new Vector2 (moveInput * movement.airSpeed, 0f);
 			rb.velocity += deviation;
 
 			yield return null;
@@ -104,8 +112,8 @@ public class PlayerController : MonoBehaviour {
 	bool Grounded ()
 	//returns whether the player is on the ground or not
 	{
-		bool ground1 = Physics2D.OverlapCircle (groundCheck1.position, checkRadius, whatIsGround);
-		bool ground2 = Physics2D.OverlapCircle (groundCheck2.position, checkRadius, whatIsGround);
+		bool ground1 = Physics2D.OverlapCircle (movement.groundCheck1.position, movement.checkRadius, movement.whatIsGround);
+		bool ground2 = Physics2D.OverlapCircle (movement.groundCheck2.position, movement.checkRadius, movement.whatIsGround);
 		return (ground1 || ground2);
 	}
 
@@ -117,10 +125,10 @@ public class PlayerController : MonoBehaviour {
 		jumpInput = Input.GetAxisRaw ("Jump");
 		moveInputRaw = Input.GetAxisRaw ("Horizontal");
 		if (jumpInput > 0) {
-			float xVelocity = groundSpeed * moveInputRaw * jumpBoost;
-			float yVelocity = jumpForce;
+			float xVelocity = movement.groundSpeed * moveInputRaw * movement.jumpBoost;
+			float yVelocity = movement.jumpForce;
 			rb.velocity = new Vector2 (xVelocity, yVelocity);
-			currentJumpCooldown = jumpCooldown;
+			currentJumpCooldown = movement.jumpCooldown;
 		}
 	}
 
@@ -132,25 +140,49 @@ public class PlayerController : MonoBehaviour {
 		jumpInput = Input.GetAxisRaw ("Jump");
 		moveInputRaw = Input.GetAxisRaw ("Horizontal");
 		if (jumpInput > 0) {
-			float xVelocity = groundSpeed * moveInputRaw * jumpBoost;
-			float yVelocity = airJumpForce;
+			float xVelocity = movement.groundSpeed * moveInputRaw * movement.jumpBoost;
+			float yVelocity = movement.airJumpForce;
 			rb.velocity = new Vector2 (xVelocity, yVelocity);
 			airJumpAvailable--;
-			currentJumpCooldown = jumpCooldown/2f;
+			currentJumpCooldown = movement.jumpCooldown/2f;
 		}
 	}
 
 	void FastFall () {
-		rb.velocity = new Vector2 (0, -2 * airJumpForce);
+		rb.velocity = new Vector2 (0, -2 * movement.airJumpForce);
 	}
 
 	void RestoreAirJump () {
-		airJumpAvailable = totalAirJumps;
+		airJumpAvailable = movement.totalAirJumps;
 	}
 
 	void ShootOnGround () {
+		if (currentShootCooldown > 0) {
+			currentShootCooldown -= Time.deltaTime;
+			return;
+		}
+
 		if (Input.GetAxisRaw ("Fire1") == 1) {
-			GameObject.Instantiate (bullet);
+			//First evaluates which direction to shoot, then shoots
+			float forward = 0;
+			float up = -1;
+
+			if (facingRight) {
+				forward = 1;
+			} else {forward = -1;}
+				
+			if (Input.GetAxisRaw ("Vertical") == 1) {
+				up = 1;
+			} else {up = 0;}
+
+			Vector2 direction = new Vector2 (forward, up);
+			direction.Normalize ();
+
+			GameObject shot = GameObject.Instantiate (bullet, this.transform.position, Quaternion.Euler(0, 0, 0));
+			BulletMovement bm = shot.GetComponent<BulletMovement> ();
+			bm.SetDirection (direction);
+
+			currentShootCooldown = shootCooldown;
 		}
 	}
 }
