@@ -8,8 +8,8 @@ public class PlayerController : MonoBehaviour {
 	[SerializeField] private float jumpForce = 30;
 	[SerializeField] private float jumpBoost = 1.5f;
 	[SerializeField] private float airSpeed = 7;
-	[SerializeField] private float airJumpForce;
-	//Gravity is 10 G
+	[SerializeField] private float airJumpForce = 20;
+	//Gravity is 10 G in Rigidbody2D
 
 	private float moveInput;
 	private float moveInputRaw;
@@ -29,6 +29,9 @@ public class PlayerController : MonoBehaviour {
 
 	private Rigidbody2D rb;
 
+	[Header("Bullet")]
+	[SerializeField] GameObject bullet;
+
 	void Start () {
 		rb = GetComponent<Rigidbody2D> ();
 		airJumpAvailable = totalAirJumps;
@@ -45,6 +48,7 @@ public class PlayerController : MonoBehaviour {
 				RestoreAirJump ();
 			}
 			GroundMove ();
+			ShootOnGround ();
 			JumpFromGround ();
 		} else {
 			if (wasGrounded) {
@@ -52,6 +56,9 @@ public class PlayerController : MonoBehaviour {
 				StartCoroutine ("AirMove");
 			}
 			JumpFromAir ();
+			if (Input.GetAxisRaw ("Vertical") == -1) {
+				FastFall ();
+			}
 		}
 	}
 
@@ -133,7 +140,17 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	void FastFall () {
+		rb.velocity = new Vector2 (0, -2 * airJumpForce);
+	}
+
 	void RestoreAirJump () {
 		airJumpAvailable = totalAirJumps;
+	}
+
+	void ShootOnGround () {
+		if (Input.GetAxisRaw ("Fire1") == 1) {
+			GameObject.Instantiate (bullet);
+		}
 	}
 }
