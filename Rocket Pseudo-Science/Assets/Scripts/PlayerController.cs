@@ -70,6 +70,7 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	//Moving with arrows___________________________________________________________________
 
 	void GroundMove ()
 	//How to move when grounded
@@ -117,6 +118,8 @@ public class PlayerController : MonoBehaviour {
 		return (ground1 || ground2);
 	}
 
+	//Jumps_______________________________________________________________________________
+
 	void JumpFromGround () {
 		if (currentJumpCooldown > 0) {
 			currentJumpCooldown -= Time.deltaTime;
@@ -144,17 +147,25 @@ public class PlayerController : MonoBehaviour {
 			float yVelocity = movement.airJumpForce;
 			rb.velocity = new Vector2 (xVelocity, yVelocity);
 			airJumpAvailable--;
+			CreateBullet (-1 * rb.velocity);
 			currentJumpCooldown = movement.jumpCooldown/2f;
 		}
 	}
 
 	void FastFall () {
+		if (currentJumpCooldown > 0) {
+			return;
+		}
 		rb.velocity = new Vector2 (0, -2 * movement.airJumpForce);
+		CreateBullet (-1 * rb.velocity);
+		currentJumpCooldown = movement.jumpCooldown/2f;
 	}
 
 	void RestoreAirJump () {
 		airJumpAvailable = movement.totalAirJumps;
 	}
+
+	//Shooting____________________________________________________________________________
 
 	void ShootOnGround () {
 		if (currentShootCooldown > 0) {
@@ -176,13 +187,20 @@ public class PlayerController : MonoBehaviour {
 			} else {up = 0;}
 
 			Vector2 direction = new Vector2 (forward, up);
-			direction.Normalize ();
 
-			GameObject shot = GameObject.Instantiate (bullet, this.transform.position, Quaternion.Euler(0, 0, 0));
-			BulletMovement bm = shot.GetComponent<BulletMovement> ();
-			bm.SetDirection (direction);
+			CreateBullet (direction);
+			//Shoot Inertia
 
 			currentShootCooldown = shootCooldown;
 		}
 	}
+
+	void CreateBullet (Vector2 direction) {
+		direction.Normalize ();
+		GameObject shot = GameObject.Instantiate (bullet, this.transform.position, Quaternion.Euler(0, 0, 0));
+		BulletMovement bm = shot.GetComponent<BulletMovement> ();
+		bm.SetDirection (direction);
+	}
+
+
 }
