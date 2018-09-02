@@ -28,6 +28,12 @@ public class BulletMovement : MonoBehaviour {
 		}
 	}
 
+	void OnTriggerEnter2D (Collider2D other) {
+		if (other.gameObject.tag != "Player") {
+			Explode ();
+		}
+	}
+
 	void Explode () {
 		//DealDamage();
 		Destroy(gameObject);

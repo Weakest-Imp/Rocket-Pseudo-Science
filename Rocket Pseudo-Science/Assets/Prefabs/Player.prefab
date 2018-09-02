@@ -173,7 +173,9 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 256
   bullet: {fileID: 1513236394479148, guid: 768368da293532e49b802adeca17ee79, type: 2}
-  shootCooldown: 1
+  shootCooldown: 0.5
+  recoilForce: 10
+  recoilTime: 0.5
 --- !u!212 &212493176501362760
 SpriteRenderer:
   m_ObjectHideFlags: 1
