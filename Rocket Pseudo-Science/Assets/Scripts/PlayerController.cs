@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour {
 
 		public int totalAirJumps = 1;
 		public float jumpCooldown = 0.3f;
+		public float coyoteTime = 0.1f;
 
 		public Transform groundCheck1;
 		public Transform groundCheck2;
@@ -28,13 +29,14 @@ public class PlayerController : MonoBehaviour {
 	private float jumpInput;
 	private int airJumpAvailable;
 	private float currentJumpCooldown;
+	private bool coyoteTimeActive;
 
 	private bool facingRight = true;
 	private bool isGrounded;
 	private bool wasGrounded;
 
 	[SerializeField] GameObject bullet;
-	[SerializeField] float shootCooldown;
+	[SerializeField] float shootCooldown = 1;
 	float currentShootCooldown;
 
 
@@ -44,6 +46,7 @@ public class PlayerController : MonoBehaviour {
 		rb = GetComponent<Rigidbody2D> ();
 		airJumpAvailable = movement.totalAirJumps;
 		currentJumpCooldown = 0;
+		coyoteTimeActive = false;
 	}
 
 	void FixedUpdate () {
@@ -62,8 +65,13 @@ public class PlayerController : MonoBehaviour {
 			if (wasGrounded) {
 				//Upon quitting ground
 				StartCoroutine ("AirMove");
+				StartCoroutine ("CoyoteTime");
 			}
-			JumpFromAir ();
+			if (coyoteTimeActive) {
+				JumpFromGround ();
+			} else {
+				JumpFromAir ();
+			}
 			if (Input.GetAxisRaw ("Vertical") == -1) {
 				FastFall ();
 			}
@@ -133,6 +141,12 @@ public class PlayerController : MonoBehaviour {
 			rb.velocity = new Vector2 (xVelocity, yVelocity);
 			currentJumpCooldown = movement.jumpCooldown;
 		}
+	}
+
+	IEnumerator CoyoteTime () {
+		coyoteTimeActive = true;
+		yield return new WaitForSeconds (movement.coyoteTime);
+		coyoteTimeActive = false;
 	}
 
 	void JumpFromAir () {
