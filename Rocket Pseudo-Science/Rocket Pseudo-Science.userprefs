@@ -2,8 +2,9 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerController.cs">
     <Files>
-      <File FileName="Assets\Scripts\PlayerController.cs" Line="38" Column="29" />
+      <File FileName="Assets\Scripts\PlayerController.cs" Line="293" Column="14" />
       <File FileName="Assets\Scripts\BulletMovement.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\TarentulaDown.cs" Line="73" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

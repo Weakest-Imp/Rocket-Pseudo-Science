@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+	[SerializeField] int maxHealth = 10;
+	int health;
+
 	[System.Serializable]
 	public class PlayerMovement {
 		public float groundSpeed = 13;
@@ -49,6 +52,7 @@ public class PlayerController : MonoBehaviour {
 	private Rigidbody2D rb;
 
 	void Start () {
+		health = maxHealth;
 		rb = GetComponent<Rigidbody2D> ();
 		airJumpAvailable = movement.totalAirJumps;
 		currentJumpCooldown = 0;
@@ -281,6 +285,16 @@ public class PlayerController : MonoBehaviour {
 		}
 		this.enabled = true;
 
+	}
+
+	//Other_______________________________________________________________________________
+
+	void TakeDamage(int damage) {
+		//Knockback
+		health -= damage;
+		if (health <= 0) {
+			GameOver ();
+		}
 	}
 
 
