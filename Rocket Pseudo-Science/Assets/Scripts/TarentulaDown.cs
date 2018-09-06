@@ -4,24 +4,31 @@ using UnityEngine;
 
 public class TarentulaDown : MonoBehaviour {
 
-	[SerializeField] GameObject player;
-	[SerializeField] float detectDistanceX;
-	[SerializeField] float detectDistanceY;
+	[SerializeField] int maxHealth = 1;
+	private int health;
 
-	[SerializeField] float speed;
+	[SerializeField] GameObject player;
+	[SerializeField] float detectDistanceX = 20;
+	[SerializeField] float detectDistanceY = 9;
+	[SerializeField] int damageDealt = 1;
+
+	[SerializeField] float speed = 5;
 	[SerializeField] Vector2[] moveSpots;
-	[SerializeField] float waitTime;
+	[SerializeField] float waitTime = 0.5f;
 	bool wait;
-	int targetSpot;
-	float reachedDistance;
+	int targetSpot = 0;
+	float reachedDistance = 0.05f;
 
 	bool targetDetected = false;
 
 	void Start () {
+		health = maxHealth;
+
 		targetDetected = false;
 		wait = false;
 		targetSpot = 0;
 		reachedDistance = 0.05f;
+
 
 		SetTargetSpots ();
 		StartCoroutine ("DetectTarget");
@@ -47,6 +54,8 @@ public class TarentulaDown : MonoBehaviour {
 		}
 	}
 
+
+	//Movement________________________________________________________________________________
 	IEnumerator SpotReached () 
 	{
 		wait = true;
@@ -68,12 +77,30 @@ public class TarentulaDown : MonoBehaviour {
 		}
 	}
 
-	void OnCollision2D (Collider2D other) {
-		if (other.gameObject.tag == "Player") {
-		
-		}
-		if (other.gameObject.tag == "Bullet") {
 
+	//Interactions________________________________________________________________________
+	void OnCollisionEnter2D (Collision2D other) {
+		if (other.gameObject.tag == "Player") {
+			PlayerController playerCon = (PlayerController) other.gameObject.GetComponent<PlayerController> ();
+			playerCon.TakeDamage(damageDealt);
+			playerCon.KnockBack (this.gameObject);
+			playerCon.StartCoroutine("Invincibility");
+		}
+	}
+
+	void OnTriggerEnter2D (Collider2D other) {
+		if (other.gameObject.tag == "Bullet") {
+			BulletMovement bullet = (BulletMovement) other.gameObject.GetComponent<BulletMovement> ();
+			int damage = bullet.damage;
+			bullet.Explode ();
+			TakeDamage (damage);
+		}
+	}
+
+	void TakeDamage (int damage) {
+		health -= damage;
+		if (health <= 0) {
+			this.gameObject.SetActive (false);
 		}
 	}
 }

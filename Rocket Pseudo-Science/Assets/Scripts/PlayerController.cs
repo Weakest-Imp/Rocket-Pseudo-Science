@@ -1,11 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour {
 
-	[SerializeField] int maxHealth = 10;
-	int health;
+	[System.Serializable]
+	public class EnemyInteraction {
+		public int maxHealth = 10;
+		public int health;
+		public float invincibilityTime = 2;
+
+		public Canvas gameOverCanvas;
+	}
+	[SerializeField] private EnemyInteraction stats;
+	private float currentInvTime = 0;
 
 	[System.Serializable]
 	public class PlayerMovement {
@@ -22,7 +31,7 @@ public class PlayerController : MonoBehaviour {
 
 		public Transform groundCheck;
 		public float checkRadius = 0.15f;
-		public LayerMask whatIsGround;
+		public LayerMask whatIsGround; //Ground
 	}
 	[SerializeField] private PlayerMovement movement;	
 
@@ -52,11 +61,12 @@ public class PlayerController : MonoBehaviour {
 	private Rigidbody2D rb;
 
 	void Start () {
-		health = maxHealth;
+		stats.health = stats.maxHealth;
 		rb = GetComponent<Rigidbody2D> ();
 		airJumpAvailable = movement.totalAirJumps;
 		currentJumpCooldown = 0;
 		coyoteTimeActive = false;
+		stats.gameOverCanvas.enabled = false;
 	}
 
 	void FixedUpdate () {
@@ -289,13 +299,46 @@ public class PlayerController : MonoBehaviour {
 
 	//Other_______________________________________________________________________________
 
-	void TakeDamage(int damage) {
-		//Knockback
-		health -= damage;
-		if (health <= 0) {
-			GameOver ();
+	public void TakeDamage(int damage) {
+		if (currentInvTime <= 0) {
+		stats.health -= damage;
+		if (stats.health <= 0) {
+				StartCoroutine ("GameOver");
+			}
 		}
 	}
 
+	IEnumerator GameOver () {
+		stats.gameOverCanvas.enabled = true;
+		yield return new WaitForSeconds (3);
+		SceneManager.LoadScene ("Training Room");
+	}
+
+	public void KnockBack (GameObject other) {
+		if (currentInvTime <= 0) {
+			this.enabled = false;
+			float directionX = transform.position.x - other.transform.position.x;
+			float directionY = transform.position.y - other.transform.position.y;
+			directionY = Mathf.Max (directionY, 1);
+			Vector2 direction = new Vector2 (directionX, directionY);
+			direction.Normalize ();
+			Debug.Log (direction);
+
+			rb.velocity = direction * movement.airJumpForce;
+			this.enabled = false;
+		}
+	}
+
+	IEnumerator Invincibility () {
+		if (currentInvTime <= 0) {
+			//Invincibility animation
+			currentInvTime = stats.invincibilityTime;
+			while (currentInvTime > 0) {
+				currentInvTime -= Time.deltaTime;
+				yield return null;
+				this.enabled = true;
+			}
+		}
+	}
 
 }

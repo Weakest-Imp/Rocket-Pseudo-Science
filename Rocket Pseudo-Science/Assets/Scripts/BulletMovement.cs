@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class BulletMovement : MonoBehaviour {
 
-	[SerializeField] float bulletSpeed;
+	[SerializeField] float bulletSpeed =25;
 	[SerializeField] Vector2 direction;
-	[SerializeField] float timeToDie;
+	[SerializeField] float timeToDie = 3;
 	float timeAlive;
 
-	[SerializeField] float damage;
+	public int damage = 1;
 
 	private Rigidbody2D rb;
 
@@ -34,8 +34,8 @@ public class BulletMovement : MonoBehaviour {
 		}
 	}
 
-	void Explode () {
-		//DealDamage();
+	public void Explode () {
+		//Boom Animation
 		Destroy(gameObject);
 	}
 
