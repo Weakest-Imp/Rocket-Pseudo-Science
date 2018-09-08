@@ -7,6 +7,7 @@ public class BulletMovement : MonoBehaviour {
 	[SerializeField] float bulletSpeed =25;
 	[SerializeField] Vector2 direction;
 	[SerializeField] float timeToDie = 3;
+	[SerializeField] GameObject explosion;
 	float timeAlive;
 
 	public int damage = 1;
@@ -35,7 +36,7 @@ public class BulletMovement : MonoBehaviour {
 	}
 
 	public void Explode () {
-		//Boom Animation
+		Object.Instantiate (explosion, this.transform.position, Quaternion.Euler(0, 0, 0));
 		Destroy(gameObject);
 	}
 

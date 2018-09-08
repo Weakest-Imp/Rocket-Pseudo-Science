@@ -102,6 +102,7 @@ MonoBehaviour:
   bulletSpeed: 25
   direction: {x: 1, y: 0}
   timeToDie: 3
+  explosion: {fileID: 1340129563772738, guid: da92ab56253a49e47b7f9ec5e8ea9f76, type: 2}
   damage: 1
 --- !u!212 &212163232071361626
 SpriteRenderer:

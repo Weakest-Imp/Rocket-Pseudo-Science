@@ -10,8 +10,6 @@ public class PlayerController : MonoBehaviour {
 		public int maxHealth = 10;
 		public int health;
 		public float invincibilityTime = 2;
-
-		public Canvas gameOverCanvas;
 	}
 	[SerializeField] private EnemyInteraction stats;
 	private float currentInvTime = 0;
@@ -49,6 +47,7 @@ public class PlayerController : MonoBehaviour {
 	[System.Serializable]
 	public class PlayerBullet {
 		public GameObject prefab;
+		public GameObject explosion;
 		public float shootCooldown = 0.5f;
 		public float recoilForce = 10;
 		public float recoilTime = 0.5f;
@@ -66,7 +65,6 @@ public class PlayerController : MonoBehaviour {
 		airJumpAvailable = movement.totalAirJumps;
 		currentJumpCooldown = 0;
 		coyoteTimeActive = false;
-		stats.gameOverCanvas.enabled = false;
 	}
 
 	void FixedUpdate () {
@@ -156,6 +154,7 @@ public class PlayerController : MonoBehaviour {
 			float yVelocity = movement.jumpForce;
 			rb.velocity = new Vector2 (xVelocity, yVelocity);
 			currentJumpCooldown = movement.jumpCooldown;
+			Object.Instantiate (bullet.explosion, this.transform.position, Quaternion.Euler(0, 0, 0));
 		}
 	}
 
@@ -303,15 +302,9 @@ public class PlayerController : MonoBehaviour {
 		if (currentInvTime <= 0) {
 		stats.health -= damage;
 		if (stats.health <= 0) {
-				StartCoroutine ("GameOver");
+				GameManager.Instance.StartCoroutine ("GameOver");
 			}
 		}
-	}
-
-	IEnumerator GameOver () {
-		stats.gameOverCanvas.enabled = true;
-		yield return new WaitForSeconds (3);
-		SceneManager.LoadScene ("Training Room");
 	}
 
 	public void KnockBack (GameObject other) {
@@ -322,7 +315,6 @@ public class PlayerController : MonoBehaviour {
 			directionY = Mathf.Max (directionY, 1);
 			Vector2 direction = new Vector2 (directionX, directionY);
 			direction.Normalize ();
-			Debug.Log (direction);
 
 			rb.velocity = direction * movement.airJumpForce;
 			this.enabled = false;

@@ -17,27 +17,29 @@ public class TarentulaDown : MonoBehaviour {
 	[SerializeField] float waitTime = 0.5f;
 	bool wait;
 	int targetSpot = 0;
-	float reachedDistance = 0.05f;
+	float reachedDistance = 0.2f;
 
 	bool targetDetected = false;
 
+	private Rigidbody2D rb;
+
 	void Start () {
 		health = maxHealth;
+		rb = GetComponent<Rigidbody2D> ();
 
 		targetDetected = false;
 		wait = false;
 		targetSpot = 0;
-		reachedDistance = 0.05f;
+		reachedDistance = 0.2f;
 
 
 		SetTargetSpots ();
 		StartCoroutine ("DetectTarget");
+		NextDirection ();
 	}
 
 	void Update () {
 		if (!wait) {
-			transform.position = Vector2.MoveTowards (transform.position, 
-				moveSpots [targetSpot], speed * Time.deltaTime);
 			if (Vector2.Distance (transform.position, moveSpots [targetSpot]) < reachedDistance) {
 				StartCoroutine ("SpotReached");
 			}
@@ -59,8 +61,10 @@ public class TarentulaDown : MonoBehaviour {
 	IEnumerator SpotReached () 
 	{
 		wait = true;
+		rb.velocity = Vector2.zero;
 		yield return new WaitForSeconds (waitTime);
 		NextSpot ();
+		NextDirection ();
 		wait = false;
 	}
 	void NextSpot () {
@@ -68,6 +72,12 @@ public class TarentulaDown : MonoBehaviour {
 			targetSpot = 0;
 		} else {
 			targetSpot++;}
+	}
+	void NextDirection () {
+		Vector2 position = new Vector2 (transform.position.x, transform.position.y);
+		Vector2 direction = moveSpots [targetSpot] - position;
+		direction.Normalize ();
+		rb.velocity = speed * direction;
 	}
 
 	void SetTargetSpots () {
@@ -89,10 +99,9 @@ public class TarentulaDown : MonoBehaviour {
 	}
 
 	void OnTriggerEnter2D (Collider2D other) {
-		if (other.gameObject.tag == "Bullet") {
-			BulletMovement bullet = (BulletMovement) other.gameObject.GetComponent<BulletMovement> ();
-			int damage = bullet.damage;
-			bullet.Explode ();
+		if (other.gameObject.tag == "Explosion") {
+			Explosion explosion = (Explosion) other.gameObject.GetComponent<Explosion> ();
+			int damage = explosion.damage;
 			TakeDamage (damage);
 		}
 	}
